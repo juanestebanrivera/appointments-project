@@ -26,4 +26,9 @@ public class Service : BaseEntity
         EstimatedDuration = estimatedDuration;
         IsActive = true;
     }
+
+    public void SetActive(bool isActive)
+    {
+        IsActive = isActive;
+    }
 }

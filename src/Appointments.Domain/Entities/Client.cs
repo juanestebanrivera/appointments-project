@@ -5,10 +5,10 @@ namespace Appointments.Domain.Entities;
 
 public class Client : BaseEntity
 {
-    public string Name { get; private set; }
+    public string Name { get; private init; }
     public string Email { get; private set; }
     public string PhoneNumber { get; private set; } = string.Empty;
-    public DateTime DateOfBirth { get; private set; }
+    public DateTime DateOfBirth { get; private init; }
 
     public Client(string name, string email, DateTime dateOfBirth)
     {
