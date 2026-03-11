@@ -6,7 +6,7 @@ public record AppointmentResponse(
     Guid Id,
     Guid ClientId,
     Guid ServiceId,
-    DateTime ScheduledTime,
+    DateTimeOffset ScheduledTime,
     TimeSpan Duration,
     AppointmentStatus Status
 );
