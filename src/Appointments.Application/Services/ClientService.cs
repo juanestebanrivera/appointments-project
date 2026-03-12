@@ -29,7 +29,7 @@ public class ClientService(IClientRepository repository) : IClientService
 
         if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
         {
-            client.UpdatePhoneNumber(client.PhoneNumber);
+            client.UpdatePhoneNumber(request.PhoneNumber);
         }
 
         await _repository.AddAsync(client);
