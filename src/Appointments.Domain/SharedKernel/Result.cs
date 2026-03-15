@@ -1,4 +1,4 @@
-namespace Appointments.Domain.Shared;
+namespace Appointments.Domain.SharedKernel;
 
 public sealed record Error (string Code, string Description)
 {
@@ -27,17 +27,17 @@ public class Result
     public static Result Failure(Error error) => new(false, error);
 }
 
-public class Result<T> : Result
+public class Result<TValue> : Result
 {
-    private readonly T? _value;
-    public T Value => IsSuccess ? _value! : throw new InvalidOperationException("The value of a failure result can't be accessed.");
+    private readonly TValue? _value;
+    public TValue Value => IsSuccess ? _value! : throw new InvalidOperationException("The value of a failure result can't be accessed.");
 
-    private Result(T? value,bool isSuccess, Error error) : base(isSuccess, error)
+    private Result(TValue? value,bool isSuccess, Error error) : base(isSuccess, error)
     {
         _value = value;    
     }
 
-    public static Result<T> Success(T value) => new(value, true, Error.None);
-    public static new Result<T> Failure(Error error) => new(default, false, error);
+    public static Result<TValue> Success(TValue value) => new(value, true, Error.None);
+    public static new Result<TValue> Failure(Error error) => new(default, false, error);
 }
 

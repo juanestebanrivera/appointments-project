@@ -1,14 +1,16 @@
 using System.Text.RegularExpressions;
-using Appointments.Domain.Errors.ValueObjects;
-using Appointments.Domain.Shared;
+using Appointments.Domain.SharedKernel;
 
-namespace Appointments.Domain.ValueObjects;
+namespace Appointments.Domain.Clients;
 
 public partial record Email
 {
     public string Value { get; }
 
-    private Email(string value) => Value = value;
+    private Email(string value) 
+    {
+        Value = value;
+    }
 
     public static Result<Email> Create(string email)
     {

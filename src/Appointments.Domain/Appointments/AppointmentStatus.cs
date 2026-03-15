@@ -1,10 +1,10 @@
-namespace Appointments.Domain.Enums;
+namespace Appointments.Domain.Appointments;
 
 public enum AppointmentStatus
 {
     Pending,
     Confirmed,
-    Ended,
+    Completed,
     Cancelled,
-    Missed,
+    NoShow,
 }

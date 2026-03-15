@@ -1,6 +1,6 @@
-using Appointments.Domain.Shared;
+using Appointments.Domain.SharedKernel;
 
-namespace Appointments.Domain.Errors.ValueObjects;
+namespace Appointments.Domain.Clients;
 
 public record PhoneNumber
 {
