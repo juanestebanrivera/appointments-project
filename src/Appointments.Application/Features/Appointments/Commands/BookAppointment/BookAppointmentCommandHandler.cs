@@ -10,13 +10,15 @@ public sealed class BookAppointmentCommandHandler(
     IAppointmentRepository appointmentRepository,
     IClientRepository clientRepository,
     IServiceRepository serviceRepository,
-    IUnitOfWork unitOfWork
+    IUnitOfWork unitOfWork,
+    TimeProvider timeProvider
 ) : IBookAppointmentCommandHandler
 {
     private readonly IAppointmentRepository _appointmentRepository = appointmentRepository;
     private readonly IClientRepository _clientRepository = clientRepository;
     private readonly IServiceRepository _serviceRepository = serviceRepository;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly TimeProvider _timeProvider = timeProvider;
 
     public async Task<Result<Guid>> HandleAsync(BookAppointmentCommand command, CancellationToken cancellationToken = default)
     {
@@ -31,13 +33,15 @@ public sealed class BookAppointmentCommandHandler(
             return Result<Guid>.Failure(AppointmentApplicationErrors.ServiceNotFound);
 
         var endTime = command.StartTime.Add(service.Duration);
+        var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
 
         var appointmentResult = Appointment.Book(
             command.ClientId,
             command.ServiceId,
             command.StartTime,
             endTime,
-            service.Price
+            service.Price,
+            currentTime
         );
 
         if (appointmentResult.IsFailure)

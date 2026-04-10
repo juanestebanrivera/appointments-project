@@ -6,11 +6,13 @@ namespace Appointments.Application.Features.Appointments.Commands.RescheduleAppo
 
 public sealed class RescheduleAppointmentCommandHandler(
     IAppointmentRepository appointmentRepository,
-    IUnitOfWork unitOfWork
+    IUnitOfWork unitOfWork,
+    TimeProvider timeProvider
 ) : IRescheduleAppointmentCommandHandler
 {
     private readonly IAppointmentRepository _appointmentRepository = appointmentRepository;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly TimeProvider _timeProvider = timeProvider;
 
     public async Task<Result> HandleAsync(RescheduleAppointmentCommand command, CancellationToken cancellationToken = default)
     {
@@ -19,7 +21,8 @@ public sealed class RescheduleAppointmentCommandHandler(
         if (appointment is null)
             return Result.Failure(AppointmentApplicationErrors.NotFound);
 
-        var result = appointment.Reschedule(command.NewStartTime);
+        var currentTime = _timeProvider.GetUtcNow().UtcDateTime;
+        var result = appointment.Reschedule(command.NewStartTime, currentTime);
 
         if (result.IsFailure)
             return Result.Failure(result.Error);

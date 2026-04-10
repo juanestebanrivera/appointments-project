@@ -22,7 +22,7 @@ public sealed class Appointment : Entity, IAggregateRoot
         Status = status;
     }
 
-    public static Result<Appointment> Book(Guid clientId, Guid serviceId, DateTimeOffset startTime, DateTimeOffset endTime, decimal priceAtBooking, DateTimeOffset currentTime = default)
+    public static Result<Appointment> Book(Guid clientId, Guid serviceId, DateTimeOffset startTime, DateTimeOffset endTime, decimal priceAtBooking, DateTimeOffset currentTime)
     {
         if (clientId == Guid.Empty)
             return Result<Appointment>.Failure(AppointmentErrors.ClientIsRequired);
@@ -41,7 +41,7 @@ public sealed class Appointment : Entity, IAggregateRoot
         return Result<Appointment>.Success(new(Guid.NewGuid(), clientId, serviceId, priceAtBooking, startTime, endTime, AppointmentStatus.Pending));
     }
 
-    public Result Reschedule(DateTimeOffset newStartTime, DateTimeOffset currentTime = default)
+    public Result Reschedule(DateTimeOffset newStartTime, DateTimeOffset currentTime)
     {
         if (Status == AppointmentStatus.Cancelled || Status == AppointmentStatus.Completed || Status == AppointmentStatus.NoShow)
             return Result.Failure(AppointmentErrors.InvalidStatusTransition);
@@ -98,11 +98,8 @@ public sealed class Appointment : Entity, IAggregateRoot
         return Result.Success();
     }
     
-    private static Result ValidateTime(DateTimeOffset startTime, DateTimeOffset endTime, DateTimeOffset currentTime = default)
+    private static Result ValidateTime(DateTimeOffset startTime, DateTimeOffset endTime, DateTimeOffset currentTime)
     {
-        if (currentTime == default)
-            currentTime = DateTimeOffset.Now;
-
         if (startTime < currentTime)
             return Result.Failure(AppointmentErrors.TimeCannotBeInThePast);
 
