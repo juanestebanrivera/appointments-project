@@ -18,7 +18,7 @@ public static class DependencyInjection
         if (string.IsNullOrEmpty(connectionString))
             throw new ArgumentException("Connection string cannot be null or empty.", nameof(connectionString));
 
-        services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
+        services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
         services.AddScoped<IClientRepository, ClientRepository>();
