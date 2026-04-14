@@ -1,0 +1,25 @@
+# Build
+**/[Bb]in/
+**/[Oo]bj/
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*
+.dockerignore
+
+# Environment and secrets
+.env
+.env.*
+appsettings.Development.json
+usersecrets.json
+
+# Others
+.vs/
+.vscode/
+*.md
+LICENSE
+*.db
