@@ -19,10 +19,20 @@ public sealed class UpdateClientCommandHandler(
         if (client is null)
             return Result.Failure(ClientApplicationErrors.NotFound);
 
-        var changeResult = client.ChangeName(command.FirstName, command.LastName);
-        
+        var resultFirstName = PersonName.Create(command.FirstName, nameof(Client.FirstName));
+
+        if (resultFirstName.IsFailure)
+            return Result.Failure(resultFirstName.Error);
+
+        var resultLastName = PersonName.Create(command.LastName, nameof(Client.LastName));
+
+        if (resultLastName.IsFailure)
+            return Result.Failure(resultLastName.Error);
+
+        var changeResult = client.ChangeName(resultFirstName.Value, resultLastName.Value);
+
         if (changeResult.IsFailure)
-            return Result.Failure(changeResult.Error);        
+            return Result.Failure(changeResult.Error);
 
         if (!string.IsNullOrWhiteSpace(command.Email))
         {
@@ -32,7 +42,7 @@ public sealed class UpdateClientCommandHandler(
                 return Result.Failure(emailResult.Error);
 
             client.ChangeEmail(emailResult.Value);
-        } 
+        }
         else
         {
             client.ChangeEmail(null);
@@ -48,7 +58,7 @@ public sealed class UpdateClientCommandHandler(
         if (command.IsActive)
             client.Activate();
         else
-            client.Deactivate();   
+            client.Deactivate();
 
         _clientRepository.Update(client);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

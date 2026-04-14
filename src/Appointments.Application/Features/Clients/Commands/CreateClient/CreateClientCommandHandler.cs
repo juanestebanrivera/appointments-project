@@ -31,7 +31,17 @@ public sealed class CreateClientCommandHandler(
             email = emailResult.Value;
         }
 
-        var clientResult = Client.Register(command.FirstName, command.LastName, phoneResult.Value, email);
+        var resultFirstName = PersonName.Create(command.FirstName, nameof(Client.FirstName));
+
+        if (resultFirstName.IsFailure)
+            return Result<Guid>.Failure(resultFirstName.Error);
+
+        var resultLastName = PersonName.Create(command.LastName, nameof(Client.LastName));
+
+        if (resultLastName.IsFailure)
+            return Result<Guid>.Failure(resultLastName.Error);
+
+        var clientResult = Client.Register(resultFirstName.Value, resultLastName.Value, phoneResult.Value, email);
 
         if (clientResult.IsFailure)
             return Result<Guid>.Failure(clientResult.Error);

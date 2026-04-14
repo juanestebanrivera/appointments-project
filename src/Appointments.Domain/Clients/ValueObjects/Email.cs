@@ -7,7 +7,7 @@ public partial record Email
 {
     public string Value { get; }
 
-    private Email(string value) 
+    private Email(string value)
     {
         Value = value;
     }
@@ -23,6 +23,6 @@ public partial record Email
         return Result<Email>.Success(new Email(email.ToLowerInvariant()));
     }
 
-    [GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+    [GeneratedRegex(@"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
     private static partial Regex EmailFormatRegex();
 }

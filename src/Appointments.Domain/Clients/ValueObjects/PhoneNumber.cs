@@ -18,13 +18,13 @@ public record PhoneNumber
         if (string.IsNullOrWhiteSpace(prefix))
             return Result<PhoneNumber>.Failure(PhoneNumberErrors.PhonePrefixRequired);
 
-        if (!prefix.StartsWith('+') || prefix.Length < 2 || prefix[1..].Any(char.IsLetter))
+        if (!prefix.StartsWith('+') || prefix.Length < 2 || !prefix[1..].All(char.IsDigit))
             return Result<PhoneNumber>.Failure(PhoneNumberErrors.InvalidPhonePrefix);
 
         if (string.IsNullOrWhiteSpace(number))
             return Result<PhoneNumber>.Failure(PhoneNumberErrors.PhoneNumberRequired);
 
-        if (!number.Any(char.IsDigit) || number.Length < 7)
+        if (!number.All(char.IsDigit) || number.Length < 7)
             return Result<PhoneNumber>.Failure(PhoneNumberErrors.InvalidPhoneNumberFormat);
 
         return Result<PhoneNumber>.Success(new PhoneNumber(prefix, number));

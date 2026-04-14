@@ -10,8 +10,8 @@ public static class ClientMappings
         {
             return new ClientResponse(
                 client.Id,
-                client.FirstName,
-                client.LastName,
+                client.FirstName.Value,
+                client.LastName.Value,
                 client.Phone.Prefix,
                 client.Phone.Number,
                 client.Email?.Value,

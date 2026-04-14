@@ -13,19 +13,27 @@ internal sealed class ClientConfiguration : IEntityTypeConfiguration<Client>
         builder.Property(c => c.Id).ValueGeneratedNever();
 
         builder.Property(c => c.FirstName)
+            .HasConversion(
+                v => v.Value,
+                v => PersonName.Create(v, nameof(Client.FirstName)).Value
+            )
             .HasMaxLength(100)
             .IsRequired();
 
         builder.Property(c => c.LastName)
+            .HasConversion(
+                v => v.Value,
+                v => PersonName.Create(v, nameof(Client.LastName)).Value
+            )
             .HasMaxLength(100)
             .IsRequired();
 
         builder.OwnsOne(c => c.Phone, phoneBuilder =>
         {
-           phoneBuilder.Property(p => p.Prefix)
-               .HasColumnName("PhonePrefix")
-               .HasMaxLength(6)
-               .IsRequired();
+            phoneBuilder.Property(p => p.Prefix)
+                .HasColumnName("PhonePrefix")
+                .HasMaxLength(6)
+                .IsRequired();
 
             phoneBuilder.Property(p => p.Number)
                 .HasColumnName("PhoneNumber")
