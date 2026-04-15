@@ -11,11 +11,7 @@ public class AppointmentTests
         Guid clientId = Guid.Empty;
         Guid serviceId = Guid.NewGuid();
         decimal priceAtBooking = 100;
-
-        DateTimeOffset startTime = DateTimeOffset.Parse("2026-01-01T10:00:00Z");
-        DateTimeOffset endTime = startTime.AddHours(1);
-        DateTimeOffset currentTime = DateTimeOffset.Parse("2024-01-01T00:00:00Z");
-        var timeRange = TimeRange.Create(startTime, endTime, currentTime).Value;
+        var timeRange = CreateValidTimeRange();
 
         // Act
         var result = Appointment.Book(clientId, serviceId, timeRange, priceAtBooking);
@@ -32,11 +28,7 @@ public class AppointmentTests
         Guid clientId = Guid.NewGuid();
         Guid serviceId = Guid.Empty;
         decimal priceAtBooking = 100;
-
-        DateTimeOffset startTime = DateTimeOffset.Parse("2026-01-01T10:00:00Z");
-        DateTimeOffset endTime = startTime.AddHours(1);
-        DateTimeOffset currentTime = DateTimeOffset.Parse("2024-01-01T00:00:00Z");
-        var timeRange = TimeRange.Create(startTime, endTime, currentTime).Value;
+        var timeRange = CreateValidTimeRange();
 
         // Act
         var result = Appointment.Book(clientId, serviceId, timeRange, priceAtBooking);
@@ -54,11 +46,7 @@ public class AppointmentTests
         // Arrange
         Guid clientId = Guid.NewGuid();
         Guid serviceId = Guid.NewGuid();
-
-        DateTimeOffset startTime = DateTimeOffset.Parse("2026-01-01T10:00:00Z");
-        DateTimeOffset endTime = startTime.AddHours(1);
-        DateTimeOffset currentTime = DateTimeOffset.Parse("2024-01-01T00:00:00Z");
-        var timeRange = TimeRange.Create(startTime, endTime, currentTime).Value;
+        var timeRange = CreateValidTimeRange();
 
         // Act
         var result = Appointment.Book(clientId, serviceId, timeRange, priceAtBooking);
@@ -75,11 +63,7 @@ public class AppointmentTests
         Guid clientId = Guid.NewGuid();
         Guid serviceId = Guid.NewGuid();
         decimal priceAtBooking = 100;
-
-        DateTimeOffset startTime = DateTimeOffset.Parse("2026-01-01T10:00:00Z");
-        DateTimeOffset endTime = startTime.AddHours(1);
-        DateTimeOffset currentTime = DateTimeOffset.Parse("2024-01-01T00:00:00Z");
-        var timeRange = TimeRange.Create(startTime, endTime, currentTime).Value;
+        var timeRange = CreateValidTimeRange();
 
         // Act
         var result = Appointment.Book(clientId, serviceId, timeRange, priceAtBooking);
@@ -100,14 +84,14 @@ public class AppointmentTests
     public void Reschedule_WhenStatusIsCancelled_ReturnsFailure()
     {
         // Arrange
-        var currentTime = DateTimeOffset.Parse("2024-01-01T00:00:00Z");
+        var currentTime = GetDefaultCurrentTime();
         var appointment = CreateValidAppointment(currentTime);
 
         appointment.Cancel();
 
         var newTimeRange = TimeRange.Create(
-            startTime: DateTimeOffset.Parse("2026-01-02T10:00:00Z"),
-            endTime: DateTimeOffset.Parse("2026-01-02T11:00:00Z"),
+            startTime: new(2026, 1, 2, 10, 0, 0, TimeSpan.Zero),
+            endTime: new(2026, 1, 2, 11, 0, 0, TimeSpan.Zero),
             currentTime: currentTime
         ).Value;
 
@@ -123,15 +107,15 @@ public class AppointmentTests
     public void Reschedule_WhenStatusIsCompleted_ReturnsFailure()
     {
         // Arrange
-        var currentTime = DateTimeOffset.Parse("2024-01-01T00:00:00Z");
+        var currentTime = GetDefaultCurrentTime();
         var appointment = CreateValidAppointment(currentTime);
 
         appointment.Confirm();
         appointment.Complete();
 
         var newTimeRange = TimeRange.Create(
-            startTime: DateTimeOffset.Parse("2026-01-02T10:00:00Z"),
-            endTime: DateTimeOffset.Parse("2026-01-02T11:00:00Z"),
+            startTime: new(2026, 1, 2, 10, 0, 0, TimeSpan.Zero),
+            endTime: new(2026, 1, 2, 11, 0, 0, TimeSpan.Zero),
             currentTime: currentTime
         ).Value;
 
@@ -147,15 +131,15 @@ public class AppointmentTests
     public void Reschedule_WhenStatusIsNoShow_ReturnsFailure()
     {
         // Arrange
-        var currentTime = DateTimeOffset.Parse("2024-01-01T00:00:00Z");
+        var currentTime = GetDefaultCurrentTime();
         var appointment = CreateValidAppointment(currentTime);
 
         appointment.Confirm();
         appointment.MarkAsNoShow();
 
         var newTimeRange = TimeRange.Create(
-            startTime: DateTimeOffset.Parse("2026-01-02T10:00:00Z"),
-            endTime: DateTimeOffset.Parse("2026-01-02T11:00:00Z"),
+            startTime: new(2026, 1, 2, 10, 0, 0, TimeSpan.Zero),
+            endTime: new(2026, 1, 2, 11, 0, 0, TimeSpan.Zero),
             currentTime: currentTime
         ).Value;
 
@@ -171,12 +155,12 @@ public class AppointmentTests
     public void Reschedule_WhenStatusIsPending_ReturnsSuccessAndUpdatesTimeRange()
     {
         // Arrange
-        var currentTime = DateTimeOffset.Parse("2024-01-01T00:00:00Z");
+        var currentTime = GetDefaultCurrentTime();
         var appointment = CreateValidAppointment(currentTime);
 
         var newTimeRange = TimeRange.Create(
-            startTime: DateTimeOffset.Parse("2026-01-02T10:00:00Z"),
-            endTime: DateTimeOffset.Parse("2026-01-02T11:00:00Z"),
+            startTime: new(2026, 1, 2, 10, 0, 0, TimeSpan.Zero),
+            endTime: new(2026, 1, 2, 11, 0, 0, TimeSpan.Zero),
             currentTime: currentTime
         ).Value;
 
@@ -193,25 +177,14 @@ public class AppointmentTests
     public void Reschedule_WhenStatusIsConfirmed_ReturnsSuccessAndUpdatesTimeRange()
     {
         // Arrange
-        var currentTime = DateTimeOffset.Parse("2024-01-01T00:00:00Z");
-        var timeRange = TimeRange.Create(
-            startTime: DateTimeOffset.Parse("2026-01-01T10:00:00Z"),
-            endTime: DateTimeOffset.Parse("2026-01-01T11:00:00Z"),
-            currentTime: currentTime
-        ).Value;
-
-        var appointment = Appointment.Book(
-            clientId: Guid.NewGuid(),
-            serviceId: Guid.NewGuid(),
-            timeRange: timeRange,
-            priceAtBooking: 100
-        ).Value;
+        var currentTime = GetDefaultCurrentTime();
+        var appointment = CreateValidAppointment(currentTime);
 
         appointment.Confirm();
 
         var newTimeRange = TimeRange.Create(
-            startTime: DateTimeOffset.Parse("2026-01-02T10:00:00Z"),
-            endTime: DateTimeOffset.Parse("2026-01-02T11:00:00Z"),
+            startTime: new(2026, 1, 2, 10, 0, 0, TimeSpan.Zero),
+            endTime: new(2026, 1, 2, 11, 0, 0, TimeSpan.Zero),
             currentTime: currentTime
         ).Value;
 
@@ -544,13 +517,20 @@ public class AppointmentTests
         Assert.Equal(AppointmentStatus.NoShow, appointment.Status);
     }
 
+    private static DateTimeOffset GetDefaultCurrentTime() => new(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+    private static TimeRange CreateValidTimeRange(DateTimeOffset? currentTime = null)
+    {
+        DateTimeOffset startTime = new(2026, 1, 1, 10, 0, 0, TimeSpan.Zero);
+        DateTimeOffset endTime = startTime.AddHours(1);
+        DateTimeOffset current = currentTime ?? GetDefaultCurrentTime();
+
+        return TimeRange.Create(startTime, endTime, current).Value;
+    }
+
     private static Appointment CreateValidAppointment(DateTimeOffset? currentTime = null)
     {
-        var timeRange = TimeRange.Create(
-            startTime: DateTimeOffset.Parse("2026-01-01T10:00:00Z"),
-            endTime: DateTimeOffset.Parse("2026-01-01T11:00:00Z"),
-            currentTime: currentTime ?? DateTimeOffset.Parse("2024-01-01T00:00:00Z")
-        ).Value;
+        var timeRange = CreateValidTimeRange(currentTime);
 
         return Appointment.Book(
             clientId: Guid.NewGuid(),

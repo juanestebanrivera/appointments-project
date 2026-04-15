@@ -44,18 +44,19 @@ public class ServiceTests
     }
 
     [Theory]
-    [InlineData("00:05:00")]
-    [InlineData("00:04:59")]
-    public void Create_WhenDurationIsLessThanOrEqualToFiveMinutes_ReturnsFailure(string duration)
+    [InlineData(4, 59)]
+    [InlineData(5, 0)]
+    public void Create_WhenDurationIsLessThanOrEqualToFiveMinutes_ReturnsFailure(int minutes, int seconds)
     {
         // Arrange
         string name = "Service Name";
         decimal price = 100;
         string description = "Service description";
         bool isActive = true;
+        TimeSpan duration = TimeSpan.FromMinutes(minutes).Add(TimeSpan.FromSeconds(seconds));
 
         // Act
-        var result = Service.Create(name, price, TimeSpan.Parse(duration), description, isActive);
+        var result = Service.Create(name, price, duration, description, isActive);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -190,15 +191,16 @@ public class ServiceTests
     }
 
     [Theory]
-    [InlineData("00:05:00")]
-    [InlineData("00:04:59")]
-    public void ChangeDuration_WhenNewDurationIsLessThanOrEqualToFiveMinutes_ReturnsFailure(string newDuration)
+    [InlineData(5)]
+    [InlineData(4, 59)]
+    public void ChangeDuration_WhenNewDurationIsLessThanOrEqualToFiveMinutes_ReturnsFailure(int minutes, int seconds = 0)
     {
         // Arrange
         var service = CreateValidService();
+        TimeSpan newDuration = TimeSpan.FromMinutes(minutes).Add(TimeSpan.FromSeconds(seconds));
 
         // Act
-        var result = service.ChangeDuration(TimeSpan.Parse(newDuration));
+        var result = service.ChangeDuration(newDuration);
 
         // Assert
         Assert.True(result.IsFailure);

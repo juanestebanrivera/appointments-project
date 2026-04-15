@@ -8,9 +8,9 @@ public class TimeRangeTests
     public void Create_WhenStartTimeIsInThePast_ReturnsFailure()
     {
         // Arrange
-        DateTimeOffset startTime = DateTimeOffset.Parse("2026-01-01T10:00:00Z");
+        var currentTime = GetDefaultCurrentTime();
+        DateTimeOffset startTime = currentTime.AddDays(-1);
         DateTimeOffset endTime = startTime.AddHours(1);
-        DateTimeOffset currentTime = DateTimeOffset.Parse("2026-02-01T00:00:00Z");
 
         // Act
         var result = TimeRange.Create(startTime, endTime, currentTime);
@@ -21,14 +21,14 @@ public class TimeRangeTests
     }
 
     [Theory]
-    [InlineData("2026-01-01T10:00:00Z", "2026-01-01T10:00:00Z")]
-    [InlineData("2026-01-02T10:00:00Z", "2026-01-01T09:00:00Z")]
-    public void Create_WhenEndTimeIsBeforeOrEqualToStartTime_ReturnsFailure(string startTimeString, string endTimeString)
+    [InlineData(10, 10)]
+    [InlineData(10, 9)]
+    public void Create_WhenEndTimeIsBeforeOrEqualToStartTime_ReturnsFailure(int startHour, int endHour)
     {
         // Arrange
-        DateTimeOffset startTime = DateTimeOffset.Parse(startTimeString);
-        DateTimeOffset endTime = DateTimeOffset.Parse(endTimeString);
-        DateTimeOffset currentTime = DateTimeOffset.Parse("2026-01-01T00:00:00Z");
+        DateTimeOffset currentTime = GetDefaultCurrentTime();
+        DateTimeOffset startTime = new(2026, 1, 1, startHour, 0, 0, TimeSpan.Zero);
+        DateTimeOffset endTime = new(2026, 1, 1, endHour, 0, 0, TimeSpan.Zero);
 
         // Act
         var result = TimeRange.Create(startTime, endTime, currentTime);
@@ -39,14 +39,14 @@ public class TimeRangeTests
     }
 
     [Theory]
-    [InlineData("2026-01-01T10:00:00Z", "2026-01-01T10:04:59Z")]
-    [InlineData("2026-01-01T10:00:00Z", "2026-01-01T10:05:00Z")]
-    public void Create_WhenDurationIsLessThanOrEqualToFiveMinutes_ReturnsFailure(string startTimeString, string endTimeString)
+    [InlineData(4, 59)]
+    [InlineData(5, 0)]
+    public void Create_WhenDurationIsLessThanOrEqualToFiveMinutes_ReturnsFailure(int endMinutes, int endSeconds)
     {
         // Arrange
-        DateTimeOffset startTime = DateTimeOffset.Parse(startTimeString);
-        DateTimeOffset endTime = DateTimeOffset.Parse(endTimeString);
-        DateTimeOffset currentTime = DateTimeOffset.Parse("2026-01-01T00:00:00Z");
+        DateTimeOffset currentTime = GetDefaultCurrentTime();
+        DateTimeOffset startTime = new(2026, 1, 1, 10, 0, 0, TimeSpan.Zero);
+        DateTimeOffset endTime = new(2026, 1, 1, 10, endMinutes, endSeconds, TimeSpan.Zero);
 
         // Act
         var result = TimeRange.Create(startTime, endTime, currentTime);
@@ -60,9 +60,9 @@ public class TimeRangeTests
     public void Create_WhenDurationIsMoreThanOneDay_ReturnsFailure()
     {
         // Arrange
-        DateTimeOffset startTime = DateTimeOffset.Parse("2026-01-01T10:00:00Z");
+        DateTimeOffset currentTime = GetDefaultCurrentTime();
+        DateTimeOffset startTime = new(2026, 1, 1, 10, 0, 0, TimeSpan.Zero);
         DateTimeOffset endTime = startTime.AddDays(1).AddMinutes(1);
-        DateTimeOffset currentTime = DateTimeOffset.Parse("2026-01-01T00:00:00Z");
 
         // Act
         var result = TimeRange.Create(startTime, endTime, currentTime);
@@ -76,9 +76,9 @@ public class TimeRangeTests
     public void Create_WhenAllDataIsValid_ReturnsSuccessAndCreatesTimeRange()
     {
         // Arrange
-        DateTimeOffset startTime = DateTimeOffset.Parse("2026-01-01T10:00:00Z");
+        DateTimeOffset currentTime = GetDefaultCurrentTime();
+        DateTimeOffset startTime = new(2026, 1, 1, 10, 0, 0, TimeSpan.Zero);
         DateTimeOffset endTime = startTime.AddHours(1);
-        DateTimeOffset currentTime = DateTimeOffset.Parse("2026-01-01T00:00:00Z");
 
         // Act
         var result = TimeRange.Create(startTime, endTime, currentTime);
@@ -93,7 +93,7 @@ public class TimeRangeTests
     public void Create_WhenStartTimeIsExactlyCurrentTime_ReturnsSuccessAndCreatesTimeRange()
     {
         // Arrange
-        DateTimeOffset currentTime = DateTimeOffset.Parse("2026-01-01T10:00:00Z");
+        DateTimeOffset currentTime = GetDefaultCurrentTime();
         DateTimeOffset startTime = currentTime;
         DateTimeOffset endTime = startTime.AddHours(1);
 
@@ -110,9 +110,9 @@ public class TimeRangeTests
     public void Create_WhenDurationIsExactlyOneDay_ReturnsSuccessAndCreatesTimeRange()
     {
         // Arrange
-        DateTimeOffset startTime = DateTimeOffset.Parse("2026-01-01T10:00:00Z");
+        DateTimeOffset currentTime = GetDefaultCurrentTime();
+        DateTimeOffset startTime = new(2026, 1, 1, 10, 0, 0, TimeSpan.Zero);
         DateTimeOffset endTime = startTime.AddDays(1);
-        DateTimeOffset currentTime = DateTimeOffset.Parse("2026-01-01T00:00:00Z");
 
         // Act
         var result = TimeRange.Create(startTime, endTime, currentTime);
@@ -122,4 +122,6 @@ public class TimeRangeTests
         Assert.Equal(startTime, result.Value.StartTime);
         Assert.Equal(endTime, result.Value.EndTime);
     }
+
+    private static DateTimeOffset GetDefaultCurrentTime() => new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 }
