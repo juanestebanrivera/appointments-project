@@ -40,6 +40,7 @@ public sealed class Appointment : Entity, IAggregateRoot
             return Result.Failure(AppointmentErrors.InvalidStatusTransition);
 
         TimeRange = newTimeRange;
+        Status = AppointmentStatus.Pending;
 
         return Result.Success();
     }
