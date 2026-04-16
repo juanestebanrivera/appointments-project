@@ -1,4 +1,4 @@
-namespace Appointments.Api.Features.Services;
+namespace Appointments.Api.Features.Services.V1;
 
 public record UpdateServiceRequest(
     string Name,

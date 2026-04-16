@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Appointments.Api.Extensions;
 
-public static class MapEndpointsExtension
+public static class EndpointsExtension
 {
     public static IServiceCollection AddEndpoints(this IServiceCollection services)
     {
@@ -23,13 +23,21 @@ public static class MapEndpointsExtension
 
     public static IApplicationBuilder RegisterEndpoints(this WebApplication app)
     {
+        var apiVersionSet = app.NewApiVersionSet()
+            .HasApiVersion(new(1))
+            .ReportApiVersions()
+            .Build();
+
+        var globalApiGroup = app.MapGroup("/api/v{version:apiVersion}")
+                                .WithApiVersionSet(apiVersionSet);
+
         var endpoints = app.Services.GetRequiredService<IEnumerable<IEndpoint>>();
 
         foreach (var endpoint in endpoints)
         {
-            endpoint.MapEndpoints(app);
+            endpoint.MapEndpoints(globalApiGroup);
         }
-        
+
         return app;
     }
 }

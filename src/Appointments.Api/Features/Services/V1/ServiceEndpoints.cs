@@ -8,13 +8,14 @@ using Appointments.Application.Features.Services.Queries.GetAllServices;
 using Appointments.Application.Features.Services.Queries.GetServiceById;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Appointments.Api.Features.Services;
+namespace Appointments.Api.Features.Services.V1;
 
 internal class ServiceEndpoints : IEndpoint
 {
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/services");
+        var group = app.MapGroup("services")
+                       .WithTags("Services");
 
         group.MapGet("/", GetAll);
         group.MapGet("/{id:guid}", GetById).WithName("GetService");
@@ -28,7 +29,7 @@ internal class ServiceEndpoints : IEndpoint
         CancellationToken cancellationToken)
     {
         var result = await handler.HandleAsync(new GetAllServicesQuery(), cancellationToken);
-        
+
         if (result.IsFailure)
             return Results.BadRequest(result.Error);
 
@@ -50,7 +51,7 @@ internal class ServiceEndpoints : IEndpoint
 
     private static async Task<IResult> Create(
         CreateServiceCommand command,
-        [FromServices] ICommandHandler<CreateServiceCommand, Guid> handler, 
+        [FromServices] ICommandHandler<CreateServiceCommand, Guid> handler,
         CancellationToken cancellationToken)
     {
         var result = await handler.HandleAsync(command, cancellationToken);
@@ -88,5 +89,5 @@ internal class ServiceEndpoints : IEndpoint
 
         return Results.NoContent();
     }
-    
+
 }

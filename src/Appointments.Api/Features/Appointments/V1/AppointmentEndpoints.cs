@@ -11,13 +11,14 @@ using Appointments.Application.Features.Appointments.Queries.GetAllAppointments;
 using Appointments.Application.Features.Appointments.Queries.GetAppointmentById;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Appointments.Api.Features.Appointments;
+namespace Appointments.Api.Features.Appointments.V1;
 
 internal class AppointmentEndpoints : IEndpoint
 {
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/appointments");
+        var group = app.MapGroup("appointments")
+                       .WithTags("Appointments");
 
         group.MapGet("/", GetAll);
         group.MapGet("/{id:guid}", GetById).WithName("GetAppointment");
@@ -34,7 +35,7 @@ internal class AppointmentEndpoints : IEndpoint
         CancellationToken cancellationToken)
     {
         var result = await handler.HandleAsync(new GetAllAppointmentsQuery(), cancellationToken);
-        
+
         if (result.IsFailure)
             return Results.BadRequest(result.Error);
 

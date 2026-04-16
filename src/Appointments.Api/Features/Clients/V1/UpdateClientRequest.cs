@@ -1,4 +1,4 @@
-namespace Appointments.Api.Features.Clients;
+namespace Appointments.Api.Features.Clients.V1;
 
 public record UpdateClientRequest(
     string FirstName,
