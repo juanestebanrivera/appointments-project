@@ -1,4 +1,5 @@
 using Appointments.Api.Infrastructure.Endpoints;
+using Appointments.Api.Infrastructure.RateLimiting;
 using Asp.Versioning;
 
 namespace Appointments.Api;
@@ -8,8 +9,11 @@ public static class DependencyInjection
     public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddApiVersion();
-        services.AddOpenApi();
         services.AddEndpoints();
+        services.AddOpenApi();
+        services.AddProblemDetails();
+
+        services.AddCustomRateLimiting(configuration);
 
         return services;
     }
