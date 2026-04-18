@@ -31,7 +31,7 @@ internal class ClientEndpoints : IEndpoint
              .ProducesProblem(StatusCodes.Status404NotFound);
 
         group.MapPost("/", Create)
-             .Produces<Guid>(StatusCodes.Status201Created)
+             .Produces(StatusCodes.Status201Created)
              .ProducesProblem(StatusCodes.Status400BadRequest);
 
         group.MapPut("/{id:guid}", Update)

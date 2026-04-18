@@ -2,7 +2,7 @@ using System.Threading.RateLimiting;
 
 namespace Appointments.Api.Infrastructure.RateLimiting;
 
-public static class RateLimiterSetup
+public static class RateLimiterExtensions
 {
     public static IServiceCollection AddCustomRateLimiting(this IServiceCollection services, IConfiguration configuration)
     {

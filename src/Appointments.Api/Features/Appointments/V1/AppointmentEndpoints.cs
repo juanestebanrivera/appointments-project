@@ -30,7 +30,7 @@ internal class AppointmentEndpoints : IEndpoint
              .ProducesProblem(StatusCodes.Status404NotFound);
 
         group.MapPost("/", Book)
-             .Produces<Guid>(StatusCodes.Status201Created)
+             .Produces(StatusCodes.Status201Created)
              .ProducesProblem(StatusCodes.Status400BadRequest)
              .ProducesProblem(StatusCodes.Status404NotFound)
              .ProducesProblem(StatusCodes.Status409Conflict);

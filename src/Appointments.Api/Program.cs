@@ -1,5 +1,6 @@
 using Appointments.Api;
 using Appointments.Api.Infrastructure.Endpoints;
+using Appointments.Api.Infrastructure.Middlewares;
 using Appointments.Application;
 using Appointments.Infrastructure;
 
@@ -9,7 +10,7 @@ string connectionString = builder.Configuration.GetConnectionString("DefaultConn
 builder.Services
     .AddApplication()
     .AddInfrastructure(connectionString)
-    .AddPresentation(builder.Configuration);
+    .AddPresentation(builder);
 
 var app = builder.Build();
 
@@ -25,6 +26,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseHttpLogging();
+
 app.UseRateLimiter();
 app.UseOutputCache();
 
