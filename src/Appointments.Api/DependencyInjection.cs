@@ -7,45 +7,52 @@ namespace Appointments.Api;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddPresentation(this IServiceCollection services, WebApplicationBuilder builder)
+    extension(IServiceCollection services)
     {
-        services.AddApiVersion();
-        services.AddEndpoints();
-        services.AddOpenApi();
-        services.AddProblemDetails();
-
-        services.AddCustomRateLimiting(builder.Configuration);
-        services.AddCustomHttpLogging(builder.Environment);
-        services.AddOutputCaching();
-
-        return services;
-    }
-
-    private static IServiceCollection AddApiVersion(this IServiceCollection services)
-    {
-        services.AddApiVersioning(options =>
+        public IServiceCollection AddPresentation(WebApplicationBuilder builder)
         {
-            options.DefaultApiVersion = new(1);
-            options.ReportApiVersions = true;
-            options.ApiVersionReader = new UrlSegmentApiVersionReader();
-        })
-        .AddApiExplorer(options =>
+            services.AddApiVersion();
+            services.AddEndpoints();
+            services.AddEndpointsApiExplorer(); // Test
+            services.AddOpenApi();
+            services.AddProblemDetails();
+
+            services.AddCustomRateLimiting(builder.Configuration);
+            services.AddCustomHttpLogging(builder.Environment);
+            services.AddCaching();
+
+            return services;
+        }
+
+        private IServiceCollection AddApiVersion()
         {
-            options.GroupNameFormat = "'v'V";
-            options.SubstituteApiVersionInUrl = true;
-        });
+            services.AddApiVersioning(options =>
+            {
+                options.DefaultApiVersion = new(1);
+                options.ReportApiVersions = true;
+                options.ApiVersionReader = new UrlSegmentApiVersionReader();
+            })
+            .AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'V";
+                options.SubstituteApiVersionInUrl = true;
+            });
 
-        return services;
-    }
+            return services;
+        }
 
-    private static IServiceCollection AddOutputCaching(this IServiceCollection services)
-    {
-        services.AddOutputCache(options =>
+        private IServiceCollection AddCaching()
         {
-            options.DefaultExpirationTimeSpan = TimeSpan.FromSeconds(60);
-            options.MaximumBodySize = 1024 * 1024; // 1 MB
-        });
+            services.AddOutputCache(options =>
+            {
+                options.DefaultExpirationTimeSpan = TimeSpan.FromSeconds(60);
+                options.MaximumBodySize = 1024 * 1024; // 1 MB
+            });
 
-        return services;
+            // TODO: Use Redis or another distributed cache.
+            services.AddDistributedMemoryCache();
+
+            return services;
+        }
     }
 }

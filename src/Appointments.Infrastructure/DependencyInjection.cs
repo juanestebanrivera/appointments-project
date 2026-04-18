@@ -13,18 +13,21 @@ namespace Appointments.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString)
+    extension(IServiceCollection services)
     {
-        if (string.IsNullOrEmpty(connectionString))
-            throw new ArgumentException("Connection string cannot be null or empty.", nameof(connectionString));
+        public IServiceCollection AddInfrastructure(string connectionString)
+        {
+            if (string.IsNullOrEmpty(connectionString))
+                throw new ArgumentException("Connection string cannot be null or empty.", nameof(connectionString));
 
-        services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
-        services.AddScoped<IClientRepository, ClientRepository>();
-        services.AddScoped<IServiceRepository, ServiceRepository>();
-        services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
+            services.AddScoped<IClientRepository, ClientRepository>();
+            services.AddScoped<IServiceRepository, ServiceRepository>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
-        return services;
+            return services;
+        }
     }
 }

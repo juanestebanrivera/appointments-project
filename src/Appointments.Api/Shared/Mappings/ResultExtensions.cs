@@ -9,7 +9,7 @@ public static class ResultExtensions
         if (result.IsSuccess)
             return onSuccess();
 
-        return result.ToProblem();
+        return CreateProblem(result);
     }
 
     public static IResult ToApiResult<T>(this Result<T> result, Func<T, IResult> onSuccess)
@@ -17,10 +17,10 @@ public static class ResultExtensions
         if (result.IsSuccess)
             return onSuccess(result.Value);
 
-        return result.ToProblem();
+        return CreateProblem(result);
     }
 
-    private static IResult ToProblem(this Result result)
+    private static IResult CreateProblem(Result result)
     {
         return Results.Problem(
             title: GetTitle(result.Error.Type),
