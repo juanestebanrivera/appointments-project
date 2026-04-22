@@ -1,5 +1,6 @@
 using Appointments.Api.Infrastructure.Endpoints;
 using Appointments.Api.Infrastructure.Logging;
+using Appointments.Api.Infrastructure.Middlewares;
 using Appointments.Api.Infrastructure.RateLimiting;
 using Asp.Versioning;
 
@@ -20,6 +21,16 @@ public static class DependencyInjection
             services.AddCustomRateLimiting(builder.Configuration);
             services.AddCustomHttpLogging(builder.Environment);
             services.AddCaching();
+
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+            services.AddProblemDetails(options =>
+            {
+                options.CustomizeProblemDetails = context =>
+                {
+                    context.ProblemDetails.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
+                    context.ProblemDetails.Instance = $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
+                };
+            });
 
             return services;
         }

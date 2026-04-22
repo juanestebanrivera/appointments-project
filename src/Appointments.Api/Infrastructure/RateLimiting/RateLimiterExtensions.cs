@@ -17,15 +17,13 @@ public static class RateLimiterExtensions
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             options.OnRejected = async (context, cancellationToken) =>
             {
-                int retryAfterSeconds = 0;
-
-                if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfterTimeSpan))
+                if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out TimeSpan retryAfterTimeSpan))
                 {
-                    retryAfterSeconds = (int)retryAfterTimeSpan.TotalSeconds;
+                    var retryAfterSeconds = (int)Math.Ceiling(retryAfterTimeSpan.TotalSeconds);
                     context.HttpContext.Response.Headers.RetryAfter = retryAfterSeconds.ToString();
                 }
 
-                var problemResult = GetRejectedProblemResult(context, retryAfterSeconds);
+                var problemResult = GetRejectedProblemResult();
 
                 await problemResult.ExecuteAsync(context.HttpContext);
             };
@@ -48,17 +46,12 @@ public static class RateLimiterExtensions
         return services;
     }
 
-    private static IResult GetRejectedProblemResult(Microsoft.AspNetCore.RateLimiting.OnRejectedContext context, int retryAfterSeconds)
+    private static IResult GetRejectedProblemResult()
     {
         return Results.Problem(
             title: "Too Many Requests",
             statusCode: StatusCodes.Status429TooManyRequests,
-            detail: "You have exceeded the allowed number of requests. Please try again later.",
-            instance: context.HttpContext.Request.Path,
-            extensions: new Dictionary<string, object?>
-            {
-                { "retryAfterSeconds", retryAfterSeconds }
-            }
+            detail: "You have exceeded the allowed number of requests. Please try again later."
         );
     }
 }
